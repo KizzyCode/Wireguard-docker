@@ -13,31 +13,24 @@ function server_config() {
     echo "*> Configuring server..."
 
     # Test for network config
-    if test -z "${SERVER_SUBNET:-}"; then
-        echo "!> Missing required environment variable \$SERVER_SUBNET"
+    if test -z "${SERVER:-}"; then
+        echo "!> Missing required environment variable \$SERVER"
         exit 1
     fi
 
-    # Test for required server secrets
-    if test -z "${SERVER_KEY:-}"; then
-        echo "!> Missing required environment variable \$SERVER_KEY"
-        exit 1
-    fi
-    if test -z "${SERVER_PSK:-}"; then
-        echo "!> Missing required environment variable \$SERVER_PSK"
-        exit 1
-    fi
-
-    # Fix permissions
+    # Create config with appropriate permissions
     touch "/etc/wg0.conf"
     chown root:root "/etc/wg0.conf"
     chmod u=rwX,g=,o= "/etc/wg0.conf"
 
+    # Parse JSON
+    SERVER_KEY=`echo "$SERVER" | jq -r ".secretKey"`
+    SERVER_SUBNET=`echo "$SERVER" | jq -r ".address"`
+
     # Create config
     export SERVER_SUBNET
-    export SERVER_PORT
     export SERVER_KEY
-    export SERVER_PSK
+    export SERVER_PORT
     cat "/etc/wg0.conf.server-template" | envsubst >> "/etc/wg0.conf"
 
     # Print server info
@@ -55,42 +48,35 @@ function client_config() {
     # Print status
     echo "*> Configuring clients..."
 
-    # Test for network config
-    if test -z "${SERVER_SUBNET:-}"; then
-        echo "!> Missing required environment variable \$SERVER_SUBNET"
-        exit 1
-    fi
-
-    # Test for required clients
+    # Test for clients 
     if test -z "${CLIENTS:-}"; then
         echo "!> Missing required environment variable \$CLIENTS"
         exit 1
     fi
 
     # Configure clients
-    echo "$CLIENTS" | while read CLIENT; do
-        # Process if line is not empty
-        if test -n "$CLIENT"; then
-            # Parse client config
-            CLIENT_PUBKEY=`echo "$CLIENT" | cut -d" " -f1`
-            CLIENT_SUBNET=`echo "$CLIENT" | cut -d" " -f2`
-            CLIENT_COMMENT=`echo "$CLIENT" | cut -d" " -f3-`
+    echo "$CLIENTS" | jq -c ".[]" | while read CLIENT; do
+        # Parse JSON
+        CLIENT_NAME=`echo "$CLIENT" | jq -r ".name"`
+        CLIENT_PUBKEY=`echo "$CLIENT" | jq -r ".publicKey"`
+        CLIENT_PSK=`echo "$CLIENT" | jq -r ".presharedKey"`
+        CLIENT_SUBNET=`echo "$CLIENT" | jq -r ".address"`
 
-            # Append client config
-            export CLIENT_PUBKEY
-            export CLIENT_SUBNET
-            export CLIENT_COMMENT
-            export CLIENT_KEEP_ALIVE
-            cat "/etc/wg0.conf.client-template" | envsubst >> "/etc/wg0.conf"
+        # Append client config
+        export CLIENT_NAME
+        export CLIENT_PUBKEY
+        export CLIENT_SUBNET
+        export CLIENT_PSK
+        export CLIENT_KEEP_ALIVE
+        cat "/etc/wg0.conf.client-template" | envsubst >> "/etc/wg0.conf"
 
-            # Print client info
-            echo "*> Client has been configured:"
-            echo "    # $CLIENT_COMMENT"
-            echo "    PublicKey = $CLIENT_PUBKEY"
-            echo "    AllowedIPs = $CLIENT_SUBNET"
-            echo "    PersistentKeepalive = $CLIENT_KEEP_ALIVE"
-            echo
-        fi
+        # Print client info
+        echo "*> Client has been configured:"
+        echo "    # $CLIENT_NAME"
+        echo "    PublicKey = $CLIENT_PUBKEY"
+        echo "    AllowedIPs = $CLIENT_SUBNET"
+        echo "    PersistentKeepalive = $CLIENT_KEEP_ALIVE"
+        echo
     done
 }
 

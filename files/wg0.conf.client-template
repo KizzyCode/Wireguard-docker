@@ -1,5 +1,7 @@
 [Peer]
-# ${CLIENT_COMMENT}
+# ${CLIENT_NAME}
 PublicKey = ${CLIENT_PUBKEY}
+PresharedKey = ${CLIENT_PSK}
 AllowedIPs = ${CLIENT_SUBNET}
 PersistentKeepalive = ${CLIENT_KEEP_ALIVE}
+
