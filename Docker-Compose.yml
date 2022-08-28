@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  wireguard:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "51820:51820/udp"
+    privileged: true
+    environment:
+      # Server config (do not reuse key and PSK in prod!)
+      SERVER_SUBNET: "10.0.0.1/24"
+      SERVER_KEY: 8IVnXHzaTmK8BB8B0i6TjR5umNBA9sQVPIVHuQoqCVg=
+      SERVER_PSK: 8xDw3Od73KyL3U0EjSzneBYDFBSgC6vCdVDSI9ftBBA=
+      
+      # Client configuration
+      CLIENTS: |
+        Mi+AUXHCoNWDPdvY2MYEo2BRQrwZuazGdJjGdo2hdHA= 10.0.0.10/32 Example-Client

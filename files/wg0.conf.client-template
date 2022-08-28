@@ -1,0 +1,5 @@
+[Peer]
+# ${CLIENT_COMMENT}
+PublicKey = ${CLIENT_PUBKEY}
+AllowedIPs = ${CLIENT_SUBNET}
+PersistentKeepalive = ${CLIENT_KEEP_ALIVE}
