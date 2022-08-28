@@ -24,7 +24,7 @@ function server_config() {
     chmod u=rwX,g=,o= "/etc/wg0.conf"
 
     # Parse JSON
-    SERVER_KEY=`echo "$SERVER" | jq -r ".secretKey"`
+    SERVER_KEY=`echo "$SERVER" | jq -r ".secret_key"`
     SERVER_SUBNET=`echo "$SERVER" | jq -r ".address"`
 
     # Create config
@@ -58,8 +58,8 @@ function client_config() {
     echo "$CLIENTS" | jq -c ".[]" | while read CLIENT; do
         # Parse JSON
         CLIENT_NAME=`echo "$CLIENT" | jq -r ".name"`
-        CLIENT_PUBKEY=`echo "$CLIENT" | jq -r ".publicKey"`
-        CLIENT_PSK=`echo "$CLIENT" | jq -r ".presharedKey"`
+        CLIENT_PUBKEY=`echo "$CLIENT" | jq -r ".public_key"`
+        CLIENT_PSK=`echo "$CLIENT" | jq -r ".preshared_key"`
         CLIENT_SUBNET=`echo "$CLIENT" | jq -r ".address"`
 
         # Append client config

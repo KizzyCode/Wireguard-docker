@@ -10,15 +10,15 @@ services:
     environment:
       SERVER: |
         {
-          "secretKey": "8IVnXHzaTmK8BB8B0i6TjR5umNBA9sQVPIVHuQoqCVg=",
+          "secret_key": "8IVnXHzaTmK8BB8B0i6TjR5umNBA9sQVPIVHuQoqCVg=",
           "address": "10.0.0.1/24"
         }
       CLIENTS: |
         [
           {
             "name": "Example Client",
-            "publicKey": "Mi+AUXHCoNWDPdvY2MYEo2BRQrwZuazGdJjGdo2hdHA=",
-            "presharedKey": "8xDw3Od73KyL3U0EjSzneBYDFBSgC6vCdVDSI9ftBBA=",
+            "public_key": "Mi+AUXHCoNWDPdvY2MYEo2BRQrwZuazGdJjGdo2hdHA=",
+            "preshared_key": "8xDw3Od73KyL3U0EjSzneBYDFBSgC6vCdVDSI9ftBBA=",
             "address": "0.0.0.10/32"
           }
         ]
